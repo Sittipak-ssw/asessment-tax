@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -33,7 +34,8 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		}
 	}
 
-
+	fmt.Println(personalDeduction)
+	fmt.Println(kReceipt)
 	taxableIncome := totalIncome - totalDeductions - personalDeduction
 
 	taxLevels := []map[string]interface{}{
@@ -103,4 +105,12 @@ func calculateTaxRefund(tax float64, wht float64) float64 {
 	}
 
 	return math.Round(taxRefund)
+}
+
+func setPersonalDeduction(newPersonalDeduction float64) {
+	personalDeduction = newPersonalDeduction
+}
+
+func setKReceipt(newKReceipt float64) {
+	kReceipt = newKReceipt
 }
