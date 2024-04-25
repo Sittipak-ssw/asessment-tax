@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
     "strconv"
     "strings"
-
+	
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,7 +16,7 @@ func CalculateTaxHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
 	}
 
-	tax, taxLevels := calculateTax(req.TotalIncome, req.WHT, req.Allowances)
+	tax, taxLevels, tax_wht:= calculateTax(req.TotalIncome, req.WHT, req.Allowances)
 
 	var convertedTaxLevels []map[string]interface{}
 	for _, level := range taxLevels {
@@ -28,7 +28,7 @@ func CalculateTaxHandler(c echo.Context) error {
 	}
 
 	var taxRefund float64
-	taxRefund = calculateTaxRefund(tax, req.WHT)
+	taxRefund = calculateTaxRefund(tax_wht, req.WHT)
 
 	res := map[string]interface{}{
 		"tax":      tax,
@@ -48,8 +48,6 @@ func SetPersonalDeductionHandler(c echo.Context) error {
 	if err := c.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
 	}
-
-	setPersonalDeduction(req.Amount)
 
 	res := map[string]interface{}{
 		"personalDeduction": req.Amount,
@@ -94,10 +92,12 @@ func CalculateTaxFromCSVHandler(c echo.Context) error {
 			continue
 		}
 
-		tax, _ := calculateTax(totalIncome, wht, []Allowance{{AllowanceType: "donation", Amount: donation}})
+		tax, _, taxRefund := calculateTax(totalIncome, wht, []Allowance{{AllowanceType: "donation", Amount: donation}})
+
 		taxData := map[string]interface{}{
 			"totalIncome": totalIncome,
 			"tax":         tax,
+			"taxRefund":   taxRefund,
 		}
 		taxes = append(taxes, taxData)
 	}
