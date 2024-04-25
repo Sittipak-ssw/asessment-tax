@@ -15,6 +15,7 @@ type taxRequest struct {
 	Allowances        []Allowance `json:"allowances"`
 }
 var personalDeduction float64 = 60000.0
+var kReceipt float64 = 50000.0
 
 func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (float64, []map[string]interface{}, float64) {
 
@@ -27,6 +28,9 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 				totalDeductions += allowance.Amount
 			}
 		} 
+		if allowance.AllowanceType == "k-receipt" {
+			totalDeductions += kReceipt
+		}
 	}
 
 
