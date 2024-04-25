@@ -23,11 +23,11 @@ type taxRequest struct {
   
 }
 
-var personalDeduction float64 = 600000.0
+var personalDeduction float64 = 60000.0
+var totalDeductions float64 
 
 func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (float64, []map[string]interface{}) {
 
-	var totalDeductions float64
 	for _, allowance := range allowances {
 		if allowance.AllowanceType == "donation" {
 			if allowance.Amount > 100000.0 {
@@ -38,11 +38,8 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		} 
 	}
 
-	fmt.Println(personalDeduction)
+	taxableIncome := totalIncome - personalDeduction - totalDeductions
 
-	taxableIncome := totalIncome - totalDeductions - personalDeduction
-
-	// Calculate tax based on tax brackets
 	taxLevels := []map[string]interface{}{
 		{"level": "0-150,000", "tax": 0.0},
 		{"level": "150,001-500,000", "tax": 0.0},
