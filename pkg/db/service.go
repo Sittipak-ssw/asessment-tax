@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"fmt"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,8 +20,10 @@ type taxRequest struct {
 	TotalIncome       float64     `json:"totalIncome"`
 	WHT               float64     `json:"wht"`
 	Allowances        []Allowance `json:"allowances"`
-	PersonalDeduction float64     `json:"personalDeduction"`
+  
 }
+
+var personalDeduction float64 = 600000.0
 
 func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (float64, []map[string]interface{}) {
 
@@ -32,24 +35,12 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 			} else {
 				totalDeductions += allowance.Amount
 			}
-		} else if allowance.AllowanceType == "personal" {
-			if allowance.Amount < 10000.0 {
-				totalDeductions += 10000.0
-			} else {
-				totalDeductions += allowance.Amount
-			}
-		} else if allowance.AllowanceType == "k-receipt" {
-			if allowance.Amount > 50000.0 {
-				totalDeductions += 50000.0
-			} else {
-				totalDeductions += allowance.Amount
-			}
-		}
+		} 
 	}
 
-	totalDeductions += 60000.0
+	fmt.Println(personalDeduction)
 
-	taxableIncome := totalIncome - totalDeductions
+	taxableIncome := totalIncome - totalDeductions - personalDeduction
 
 	// Calculate tax based on tax brackets
 	taxLevels := []map[string]interface{}{
@@ -163,4 +154,9 @@ func calculateTaxFromCSVHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
+}
+
+func setPersonalDeduction(newPersonalDeduction float64)  {
+	personalDeduction = newPersonalDeduction
+	fmt.Println("Personal deduction set to: ", personalDeduction)
 }
