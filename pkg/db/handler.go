@@ -49,6 +49,8 @@ func SetPersonalDeductionHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
 	}
 
+	setPersonalDeduction(req.Amount)
+
 	res := map[string]interface{}{
 		"personalDeduction": req.Amount,
 	}
