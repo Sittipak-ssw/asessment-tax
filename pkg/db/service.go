@@ -65,7 +65,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 			}
 		}
 
-		taxLevels[1]["tax"] = tax
+		taxLevels[1]["tax"] = math.Round(tax)
 
 	case taxableIncome <= 1000000.0:
 		tax = (taxableIncome - 500000.0) * 0.15
@@ -81,7 +81,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		}
 
 		taxLevels[1]["tax"] = 35000.0
-		taxLevels[2]["tax"] = tax
+		taxLevels[2]["tax"] = math.Round(tax)
 
 	case taxableIncome <= 2000000.0:
 		tax = (taxableIncome-1000000.0)*0.2
@@ -98,8 +98,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 
 		taxLevels[1]["tax"] = 35000.0
 		taxLevels[2]["tax"] = 75000.0
-		taxLevels[3]["tax"] = tax
-
+		taxLevels[3]["tax"] = math.Round(tax)
 	default:
 		tax = (taxableIncome - 2000000)*0.35
 		taxFinal = tax + 35000.0 + 75000.0 + 200000.0
@@ -117,7 +116,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		taxLevels[1]["tax"] = 35000.0
 		taxLevels[2]["tax"] = 75000.0
 		taxLevels[3]["tax"] = 200000.0
-		taxLevels[4]["tax"] = tax
+		taxLevels[4]["tax"] = math.Round(tax)
 		
 	}
 
