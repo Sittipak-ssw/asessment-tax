@@ -51,15 +51,20 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 	switch {
 	case taxableIncome <= 150000.0:
 		tax = 0.0
-
 		taxLevels[0]["tax"] = tax
 
 	case taxableIncome <= 500000.0:
-		tax = (taxableIncome - 150000.0) * 0.1
-		taxRefund = calculateTaxRefund(tax, wht)
+		taxFinal = (taxableIncome - 150000.0) * 0.1
+		taxRefund = calculateTaxRefund(taxFinal, wht)
+
+		var tax_ float64
 		if wht > 0 {
-			tax -= wht
+			tax_ = taxFinal - wht
+			if tax_ > 0 {
+				taxFinal = tax_
+			}
 		}
+
 		taxLevels[1]["tax"] = tax
 
 	case taxableIncome <= 1000000.0:
