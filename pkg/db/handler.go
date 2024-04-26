@@ -16,7 +16,7 @@ func CalculateTaxHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
 	}
 
-	tax, taxLevels, tax_wht:= calculateTax(req.TotalIncome, req.WHT, req.Allowances)
+	tax, taxLevels, taxRefund := calculateTax(req.TotalIncome, req.WHT, req.Allowances)
 
 	var convertedTaxLevels []map[string]interface{}
 	for _, level := range taxLevels {
@@ -27,8 +27,7 @@ func CalculateTaxHandler(c echo.Context) error {
 		convertedTaxLevels = append(convertedTaxLevels, convertedTaxLevel)
 	}
 
-	var taxRefund float64
-	taxRefund = calculateTaxRefund(tax_wht, req.WHT)
+
 
 	res := map[string]interface{}{
 		"tax":      tax,
