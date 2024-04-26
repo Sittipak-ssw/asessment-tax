@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -55,12 +54,18 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		taxLevels[0]["tax"] = tax
 
 	case taxableIncome <= 500000.0:
-		tax = (taxableIncome - 150000.0) * 0.1
-		taxRefund = calculateTaxRefund(tax, wht)
+		taxFinal = (taxableIncome - 150000.0) * 0.1
+		taxRefund = calculateTaxRefund(taxFinal, wht)
+
+		var tax_ float64
 		if wht > 0 {
-			tax -= wht
+			tax_ = taxFinal - wht
+			if tax_ > 0 {
+				taxFinal = tax_
+			}
 		}
-		taxLevels[1]["tax"] = tax
+
+		taxLevels[1]["tax"] = math.Round(taxFinal)
 
 	case taxableIncome <= 1000000.0:
 		tax = (taxableIncome - 500000.0) * 0.15
@@ -76,7 +81,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		}
 
 		taxLevels[1]["tax"] = 35000.0
-		taxLevels[2]["tax"] = tax
+		taxLevels[2]["tax"] = math.Round(tax)
 
 	case taxableIncome <= 2000000.0:
 		tax = (taxableIncome-1000000.0)*0.2
@@ -93,14 +98,13 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 
 		taxLevels[1]["tax"] = 35000.0
 		taxLevels[2]["tax"] = 75000.0
-		taxLevels[3]["tax"] = tax
+		taxLevels[3]["tax"] = math.Round(tax)
 
 	default:
 		tax = (taxableIncome - 2000000)*0.35
 		taxFinal = tax + 35000.0 + 75000.0 + 200000.0
-		fmt.Println(taxFinal)
 		taxRefund = calculateTaxRefund(taxFinal, wht)
-		fmt.Println(taxRefund)
+
 		var tax_ float64
 		if wht > 0 {
 			tax_ = taxFinal - wht
@@ -112,7 +116,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		taxLevels[1]["tax"] = 35000.0
 		taxLevels[2]["tax"] = 75000.0
 		taxLevels[3]["tax"] = 200000.0
-		taxLevels[4]["tax"] = tax
+		taxLevels[4]["tax"] = math.Round(tax)
 		
 	}
 
