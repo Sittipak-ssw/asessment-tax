@@ -1,6 +1,6 @@
 module github.com/Sittipak-ssw/assessment-tax
 
-go 1.22.2
+go 1.21.0
 
 require github.com/labstack/echo/v4 v4.12.0
 
