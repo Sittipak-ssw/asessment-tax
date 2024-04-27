@@ -29,7 +29,6 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 		} 
 	}
 
-
 	taxableIncome := totalIncome - totalDeductions - personalDeduction
 
 	taxLevels := []map[string]interface{}{
@@ -41,62 +40,99 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 	}
 
 	var tax float64
+	var taxFinal float64
 	var taxRefund float64
 
 	switch {
 	case taxableIncome <= 150000.0:
 		tax = 0.0
 
-		taxLevels[0]["tax"] = math.Round(tax)
+		taxLevels[0]["tax"] = tax
 
 	case taxableIncome <= 500000.0:
-		tax = (taxableIncome - 150000.0) * 0.1
-		taxRefund = calculateTaxRefund(tax, wht)
+		taxFinal = (taxableIncome - 150000.0) * 0.1
+		taxRefund = calculateTaxRefund(taxFinal, wht)
+
+		var tax_ float64
 		if wht > 0 {
-			tax -= wht
+			tax_ = taxFinal - wht
+			if tax_ > 0 {
+				taxFinal = tax_
+			}
 		}
-		taxLevels[1]["tax"] = math.Round(tax)
+
+		taxLevels[1]["tax"] = math.Round(taxFinal)
 
 	case taxableIncome <= 1000000.0:
-		tax = 35000.0 + ((taxableIncome - 500000.0) * 0.15)
-		taxRefund = calculateTaxRefund(tax, wht)
+		tax = (taxableIncome - 500000.0) * 0.15
+		taxFinal = tax + 35000.0 
+		taxRefund = calculateTaxRefund(taxFinal, wht)
+
+		var tax_ float64
 		if wht > 0 {
-			tax -= wht
+			tax_ = taxFinal - wht
+			if tax_ > 0 {
+				taxFinal = tax_
+			}
 		}
+
+		taxLevels[1]["tax"] = 35000.0
 		taxLevels[2]["tax"] = math.Round(tax)
 
 	case taxableIncome <= 2000000.0:
-		tax = 75000.0 + ((taxableIncome-1000000.0)*0.2)
-		taxRefund = calculateTaxRefund(tax, wht)
+		tax = (taxableIncome-1000000.0)*0.2
+		taxFinal = tax + 35000.0 + 75000.0
+		taxRefund = calculateTaxRefund(taxFinal, wht)
+
+		var tax_ float64
 		if wht > 0 {
-			tax -= wht
+			tax_ = taxFinal - wht
+			if tax_ > 0 {
+				taxFinal = tax_
+			}
 		}
+
+		taxLevels[1]["tax"] = 35000.0
+		taxLevels[2]["tax"] = 75000.0
 		taxLevels[3]["tax"] = math.Round(tax)
 
 	default:
-		tax = 175000 + ((taxableIncome-2000000)*0.35)
-		taxRefund = calculateTaxRefund(tax, wht)
+		tax = (taxableIncome - 2000000)*0.35
+		taxFinal = tax + 35000.0 + 75000.0 + 200000.0
+		taxRefund = calculateTaxRefund(taxFinal, wht)
+
+		var tax_ float64
 		if wht > 0 {
-			tax -= wht
+			tax_ = taxFinal - wht
+			if tax_ > 0 {
+				taxFinal = tax_
+			}
 		}
-		
+
+		taxLevels[1]["tax"] = 35000.0
+		taxLevels[2]["tax"] = 75000.0
+		taxLevels[3]["tax"] = 200000.0
 		taxLevels[4]["tax"] = math.Round(tax)
 		
 	}
 
-	if tax < 0.0 {
-		tax = 0.0
+	if taxFinal < 0.0 {
+		taxFinal = 0.0
 	}
 
-	return math.Round(tax), taxLevels, math.Round(taxRefund)
+	return math.Round(taxFinal), taxLevels, taxRefund
 }
 
 func calculateTaxRefund(tax float64, wht float64) float64 {
 
 	taxRefund := wht - tax
-	if taxRefund < 0 {
-		taxRefund = 0
+	if taxRefund < 0.0 {
+		taxRefund = 0.0
 	}
 
 	return math.Round(taxRefund)
+}
+
+func setPersonalDeduction(newPersonalDeduction float64) {
+	personalDeduction = newPersonalDeduction
 }
