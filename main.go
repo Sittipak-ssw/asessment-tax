@@ -21,7 +21,6 @@ func main() {
 	e.POST("/tax/calculations", db.CalculateTaxHandler)
 	e.POST("/admin/deductions/personal", db.SetPersonalDeductionHandler)
 	e.POST("/tax/calculations/upload-csv", db.CalculateTaxFromCSVHandler)
-	e.POST("/admin/deductions/k-receipt", db.SetKReceiptHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
