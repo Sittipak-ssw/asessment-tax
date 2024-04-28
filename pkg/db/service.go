@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -16,7 +15,6 @@ type taxRequest struct {
 	Allowances        []Allowance `json:"allowances"`
 }
 var personalDeduction float64 = 60000.0
-var kReceipt float64 = 50000.0
 
 func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (float64, []map[string]interface{}, float64) {
 
@@ -29,9 +27,7 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 				totalDeductions += allowance.Amount
 			}
 		} 
-		if allowance.AllowanceType == "k-receipt" {
-			totalDeductions += kReceipt
-		}
+
 	}
 
 	taxableIncome := totalIncome - totalDeductions - personalDeduction
@@ -102,9 +98,9 @@ func calculateTax(totalIncome float64, wht float64, allowances []Allowance) (flo
 	default:
 		tax = (taxableIncome - 2000000)*0.35
 		taxFinal = tax + 35000.0 + 75000.0 + 200000.0
-		fmt.Println(taxFinal)
+
 		taxRefund = calculateTaxRefund(taxFinal, wht)
-		fmt.Println(taxRefund)
+
 		var tax_ float64
 		if wht > 0 {
 			tax_ = taxFinal - wht
@@ -135,12 +131,4 @@ func calculateTaxRefund(tax float64, wht float64) float64 {
 	}
 
 	return math.Round(taxRefund)
-}
-
-func setPersonalDeduction(newPersonalDeduction float64) {
-	personalDeduction = newPersonalDeduction
-}
-
-func setKReceipt(newKReceipt float64) {
-	kReceipt = newKReceipt
 }
