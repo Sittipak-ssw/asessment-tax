@@ -27,6 +27,8 @@ func CalculateTaxHandler(c echo.Context) error {
 		convertedTaxLevels = append(convertedTaxLevels, convertedTaxLevel)
 	}
 
+
+
 	res := map[string]interface{}{
 		"tax":      tax,
 		"taxLevel": convertedTaxLevels,
