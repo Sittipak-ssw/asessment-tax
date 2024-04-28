@@ -6,11 +6,27 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/Sittipak-ssw/assessment-tax/pkg/db" 
 )
+
+func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+    return func(c echo.Context) error {
+        username, password, ok := c.Request().BasicAuth()
+        if !ok {
+            return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+        }
+        if username != "adminTax" || password != "admin!"{
+            return echo.NewHTTPError(http.StatusUnauthorized, "Username/Password incorrect.")
+        }
+        fmt.Println("Authorized passed")
+        return next(c)
+    }
+}
+
 
 func main() {
 	e := echo.New()
@@ -19,8 +35,11 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.POST("/tax/calculations", db.CalculateTaxHandler)
-	e.POST("/admin/deductions/personal", db.SetPersonalDeductionHandler)
 	e.POST("/tax/calculations/upload-csv", db.CalculateTaxFromCSVHandler)
+
+	e.POST("/admin/deductions/personal", AuthMiddleware(db.SetPersonalDeductionHandler))
+
+
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -39,4 +58,3 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 }
-

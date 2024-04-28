@@ -140,7 +140,3 @@ func calculateTaxRefund(tax float64, wht float64) float64 {
 func setPersonalDeduction(newPersonalDeduction float64) {
 	personalDeduction = newPersonalDeduction
 }
-
-func setKReceipt(newKReceipt float64) {
-	kReceipt = newKReceipt
-}
