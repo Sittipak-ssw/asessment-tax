@@ -8,3 +8,13 @@ services:
     ports:
       - '5432:5432'
 
+  admin:
+    build:
+      context: .
+    ports:
+      - "1234:1234"
+    environment:
+      - PORT=8080
+      - DATABASE_URL={REPLACE_ME}
+      - ADMIN_USERNAME=adminTax
+      - ADMIN_PASSWORD=admin!
