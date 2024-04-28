@@ -10,8 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/Sittipak-ssw/assessment-tax/pkg/db" 
-
-
 )
 
 func main() {
@@ -23,6 +21,7 @@ func main() {
 	e.POST("/tax/calculations", db.CalculateTaxHandler)
 	e.POST("/admin/deductions/personal", db.SetPersonalDeductionHandler)
 	e.POST("/tax/calculations/upload-csv", db.CalculateTaxFromCSVHandler)
+	e.POST("/admin/deductions/k-receipt", db.SetKReceiptHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
