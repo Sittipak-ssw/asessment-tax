@@ -16,7 +16,7 @@ func CalculateTaxHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
 	}
 
-	tax, taxLevels, tax_wht:= calculateTax(req.TotalIncome, req.WHT, req.Allowances)
+	tax, taxLevels, taxRefund := calculateTax(req.TotalIncome, req.WHT, req.Allowances)
 
 	var convertedTaxLevels []map[string]interface{}
 	for _, level := range taxLevels {
@@ -27,9 +27,6 @@ func CalculateTaxHandler(c echo.Context) error {
 		convertedTaxLevels = append(convertedTaxLevels, convertedTaxLevel)
 	}
 
-	var taxRefund float64
-	taxRefund = calculateTaxRefund(tax_wht, req.WHT)
-
 	res := map[string]interface{}{
 		"tax":      tax,
 		"taxLevel": convertedTaxLevels,
@@ -37,22 +34,6 @@ func CalculateTaxHandler(c echo.Context) error {
 	if taxRefund > 0 {
 		res["taxRefund"] = taxRefund
 	}
-	return c.JSON(http.StatusOK, res)
-}
-
-func SetPersonalDeductionHandler(c echo.Context) error {
-	type personalDeductionRequest struct {
-		Amount float64 `json:"amount"`
-	}
-	req := new(personalDeductionRequest)
-	if err := c.Bind(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
-	}
-
-	res := map[string]interface{}{
-		"personalDeduction": req.Amount,
-	}
-
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -104,6 +85,29 @@ func CalculateTaxFromCSVHandler(c echo.Context) error {
 
 	res := map[string]interface{}{
 		"taxes": taxes,
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+func SetPersonalDeductionHandler(c echo.Context) error {
+	type personalDeductionRequest struct {
+		Amount float64 `json:"amount"`
+	}
+	req := new(personalDeductionRequest)
+	if err := c.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request payload")
+	}
+
+	if req.Amount < 10000 || req.Amount > 100000.0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid amount")
+	}
+
+
+	setPersonalDeduction(req.Amount)
+
+	res := map[string]interface{}{
+		"personalDeduction": req.Amount,
 	}
 
 	return c.JSON(http.StatusOK, res)
